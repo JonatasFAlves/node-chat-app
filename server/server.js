@@ -12,13 +12,24 @@ const publicPath = path.join(__dirname, '../public');
 app.use(express.static(publicPath));
 
 io.on('connection', (socket) => {
+
     socket.emit('newMessage', {
-        from: 'J-Server',
-        text: 'Hey man, this is your server speaking.',
-        createdAt: new Date()
+        from: 'Admin',
+        text: 'Welcome to the chat app'
     });
 
-    socket.on('createMessage', (message) => console.log(message));
+    socket.broadcast.emit('newMessage', {
+        from: 'Admin',
+        text: 'New user Joined'
+    });
+
+    socket.on('createMessage', (message) => {
+        io.emit('newMessage', {
+            from: message.from,
+            text: message.text,
+            createdAt: new Date()
+        });
+    });
 });
 
 server.listen(3000, () => console.log('Server started'));
